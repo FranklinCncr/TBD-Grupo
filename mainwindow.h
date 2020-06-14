@@ -2,7 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include <QVector>
+#include <vector>
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -34,6 +35,10 @@ private slots:
     void on_cosenoAjustado_clicked();
 
     void on_Matriz_clicked();
+
+    float fun_euclideana(QVector<float>,QVector<float>);
+    float fun_manhatan(QVector<float>,QVector<float>);
+    float fun_cosenoajustado(QVector<float>,QVector<float>);
 
 private:
     Ui::MainWindow *ui;
