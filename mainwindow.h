@@ -31,6 +31,10 @@ private slots:
 
     void on_knn_clicked();
 
+    void on_cosenoAjustado_clicked();
+
+    void on_Matriz_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
