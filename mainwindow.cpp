@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <QVector>
 using namespace std;
 ifstream db;
 ifstream db2;
@@ -27,6 +28,15 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+float MainWindow::fun_euclideana(QVector<float>data1,QVector<float>data2)
+{
+    float resultado=0;
+    for(int i=1;i<data1.size();i++){
+        resultado=resultado+pow(data1[i]+data2[i],2);
+    }
+    resultado=pow(resultado,0.5);
+    return resultado;
+}
 void MainWindow::on_manhatan_clicked()
 {
     ui->listResultados->clear();
