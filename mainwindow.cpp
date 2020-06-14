@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cmath>
 #include <QVector>
+#include <stdlib.h>
 using namespace std;
 ifstream db;
 ifstream db2;
@@ -15,6 +16,8 @@ double d;
 double d2;
 char linea[10];
 char linea2[10];
+const float INF = numeric_limits<float>::infinity();
+float resultado=0;//para resultado de distancias
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -30,12 +33,44 @@ MainWindow::~MainWindow()
 
 float MainWindow::fun_euclideana(QVector<float>data1,QVector<float>data2)
 {
-    float resultado=0;
+    resultado=0;
     for(int i=1;i<data1.size();i++){
         resultado=resultado+pow(data1[i]+data2[i],2);
     }
     resultado=pow(resultado,0.5);
     return resultado;
+}
+float MainWindow::fun_manhatan(QVector<float>data1,QVector<float>data2)
+{
+    resultado=0;
+    for(int i=1;i<data1.size();i++){
+        resultado=resultado+abs(data1[i]-data2[i]);
+    }
+    return resultado;
+}
+float MainWindow::fun_pearson(QVector<float>data1,QVector<float>data2)
+{
+    float suma1 = 0, suma2 = 0, suma3 = 0, suma4 = 0, suma5 = 0;
+        float multi = 0, raiz1 = 0, raiz2 = 0, rpta = 0;
+        for(int i = 1; i < data1.size(); ++i)
+        {
+            if(data1[i] != INF && data2[i] != INF)
+            {
+                suma1 += data1[i] * data2[i];
+                suma2 += data1[i];
+                suma3 += data2[i];
+                suma4 += data1[i];
+                suma5 += data2[i];
+            }
+        }
+        suma4=pow(suma4,2);
+        suma5=pow(suma5,2);
+        multi += (suma2 * suma3)/data1.size();
+        raiz1 += suma4 - (pow(suma2,2))/data1.size();
+        raiz2 += suma5 - (pow(suma3,2))/data1.size();
+        raiz1 = sqrt(raiz1);
+        raiz2 = sqrt(raiz2);
+        return rpta = (suma1 - multi)/(raiz1*raiz2);
 }
 void MainWindow::on_manhatan_clicked()
 {
