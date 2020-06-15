@@ -3,8 +3,24 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+<<<<<<< Updated upstream
 #include <QVector>
 #include <stdlib.h>
+=======
+
+#include <string.h>
+#include <vector>
+#include <map>
+#include <string>
+#include <iomanip>
+#include <sstream>
+#include <math.h>
+#include <cctype>
+
+
+
+
+>>>>>>> Stashed changes
 using namespace std;
 ifstream db;
 ifstream db2;
@@ -16,6 +32,7 @@ double d;
 double d2;
 char linea[10];
 char linea2[10];
+<<<<<<< Updated upstream
 //movie_ratings
 QVector<QString>indexUsers_={"Patrick C","Heather","Bryan","Patrick T","Thomas","aaron","vanessa","greg","brian","ben","Katherine","Jonathan","Zwe","Erin","Chris","Zak","Matt","Chris","Josh","Amy","Valerie","Gary","Stephen","Jessica","Jeff"};
 QVector<QString> indexMovies_={"Alien","Avatar","Blade Runner","Braveheart","Dodgeball","Forest Gump","Gladiator","Jaws","Kazaam","Lord of the Rings","Napolean Dynamite","Old School","Pootie Tang","Pulp Fiction","Scarface","Shawshank Redemption","Snakes on a Plane","Spiderman","Star Wars","The Dark Knight","The Happening","The Matrix","Toy Story","Village","You Got Mail"};
@@ -53,6 +70,299 @@ QVector<QVector<double>>ratings_={
 const float INF = numeric_limits<float>::infinity();
 float resultado=0;//para resultado de distancias
 string xlinea;
+=======
+
+bool esDigito(string cadena)
+{
+    for (int i=0;i<cadena.size();i++)
+    {
+        if (!isdigit(cadena[i]) and cadena[i]!='.')
+            return false;
+    }
+    return true;
+}
+
+float cosenoAjustada(map <string,float> product1, map <string,float> product2, map<string,float> promedios)
+{
+    float sumat1x2=0;
+    float sumat1ala2=0;
+    float sumat2ala2=0;
+
+    for(map<string,float>::iterator it=product1.begin();it!=product1.end();++it)
+    {
+        //cout<<it->second<<"->"<<it->first<<endl;
+        if(product2[it->first]!=0)
+        {
+            sumat1x2=sumat1x2+((product1[it->first]-promedios[it->first])*(product2[it->first]-promedios[it->first]));
+            cout<<it->first<<"\t"<<"("<<product1[it->first]<<"-"<<promedios[it->first]<<")";
+            cout<<"("<<product2[it->first]<<"-"<<promedios[it->first]<<")";
+            sumat1ala2=sumat1ala2+pow( product1[it->first]-promedios[it->first],2);
+            sumat2ala2=sumat2ala2+pow( product2[it->first]-promedios[it->first],2);
+        }
+        cout<<" "<<endl;
+
+    }
+
+    return sumat1x2/(sqrt(sumat1ala2)*sqrt(sumat2ala2));
+}
+
+void matrizCosenoAjustada(vector <string> personas, vector <string> productos, map<string,float> promedios,map<string,map<string,float>> matrizRating)
+{
+    /*
+    int cantpersonas=personas.size();
+    int cantproduct=productos.size();
+
+    float **matrizDistancia = new float*[cantproduct];
+    for (int i = 0; i < cantproduct; i++)
+    {
+        matrizDistancia[i] = new float[cantproduct];
+    };
+    */
+    ofstream matrizado;
+    string cadena,subcadena;
+
+    //matrizado.open("matrizResultante.csv",ios::out);
+    matrizado.open("matrizResultante1.csv",ios::out);
+    //cosenoAjustada(matrizRating[productos[0]],matrizRating[productos[1]],promedios);
+    for (int i=0;i<193609;i++)
+    {
+        for(int j=0;j<193609;j++)
+        {
+            if (j>=i)
+            {
+                //matrizDistancia[i][j]=cosenoAjustada(matrizRating[productos[i]],matrizRating[productos[j]],promedios);
+                //cout<<productos[i]<<" "<<productos[j]<<" "<<matrizDistancia[i][j]<<" "<<endl;
+                //matrizado<<cosenoAjustada(matrizRating[productos[i]],matrizRating[productos[j]],promedios)<<",";
+                matrizado<<cosenoAjustada(matrizRating[to_string(i)],matrizRating[to_string(j)],promedios)<<",";
+            }
+            else
+            {
+                //matrizDistancia[i][j]=-1;
+                matrizado<<-1<<",";
+            }
+
+        }
+        matrizado<<endl;
+        cout<<endl;
+    }
+
+}
+
+
+void cargarBD()
+{
+    map<string,map<string,float>> matrizRatings;
+    vector <string> cabeceraPersonas;
+    map <string,float> promedioxPer;
+    map <string,float> promedioCant;
+    vector <string> cabeceraProductos;
+    ifstream lctraPagind;
+    //lctraPagind.open("paginado.csv",ios::in);
+    //lctraPagind.open("paginado1.csv",ios::in);
+    lctraPagind.open("MovieRatings/Movie_Ratings.csv",ios::in);
+    //lctraPagind.open("matrEjem.csv",ios::in);
+
+    int contadorlinea=0,contadorPersonas=0,contadorCaract=0,contadorProductos=0;
+
+    string producto,persona,cadena,subcadena;
+    float puntuacion;
+    string cabecer;
+
+    while (getline(lctraPagind,cadena))
+    {
+        if(contadorlinea==0)
+        {
+            istringstream cadena1(cadena);
+            //cout<<cadena<<endl;
+            while(getline(cadena1,subcadena,','))
+            {
+                if(subcadena.size()>0)
+                cabeceraPersonas.push_back(subcadena);
+            }
+
+        }
+        else
+        {
+            istringstream cadena1(cadena);
+            //cout<<cadena<<endl;
+            bool almacenar=false;
+            while(getline(cadena1,subcadena,','))
+            {
+                if(contadorCaract==0)
+                {
+                    cabeceraProductos.push_back(subcadena);
+                    producto=subcadena;
+                }
+                else if(subcadena.size()>0)
+                {
+                    puntuacion=stof(subcadena);
+                    persona=cabeceraPersonas[contadorCaract-1];
+                    //cout <<producto<<" "<<persona<<" "<<puntuacion<<endl;
+                    matrizRatings[producto][persona]=puntuacion;
+
+                    promedioxPer[persona]=promedioxPer[persona]+puntuacion;
+                    promedioCant[persona]=promedioCant[persona]+1;
+                }
+                contadorCaract++;
+            };
+        }
+        contadorlinea++;
+        contadorCaract=0;
+    };
+    //cout<<matrizRatings[cabeceraProductos[1]][cabeceraPersonas[9]]<<endl;
+    //cout<<matrizRatings["\"Avatar\""]["\"ben\""]<<endl;
+
+    for(map<string,float>::iterator it=promedioxPer.begin();it!=promedioxPer.end();++it)
+    {
+        it->second=it->second/promedioCant[it->first];
+    }
+
+    matrizCosenoAjustada(cabeceraPersonas,cabeceraProductos,promedioxPer,matrizRatings);
+
+    lctraPagind.close();
+
+
+}
+
+//matriz grande
+
+void procesarDb()
+{
+    ifstream lectura;
+    ofstream paginado;
+    string cadena,subcadena;
+
+    //lectura.open("cr.csv",ios::in);
+    lectura.open("libimseti/ratings.dat",ios::in);
+    //lectura.open("ml-latest-small/ratings.csv",ios::in);
+    //paginado.open("paginado.csv",ios::out);
+    paginado.open("paginado1.csv",ios::out);
+
+    //proceado ratings
+
+    string persona="";
+    int contador=0;
+
+    while (getline(lectura,cadena))
+    {
+
+        istringstream cadena1(cadena);
+        vector<string> valores;
+
+        while(getline(cadena1,subcadena,','))
+        {
+            //bcadena=quitarComill(subcadena);
+            if(contador==0)
+            {
+                if(persona!=subcadena)
+                {
+                    paginado<<endl;
+                    paginado<<subcadena;
+                    persona=subcadena;
+                }
+
+            }
+            if(contador==1)
+            {
+                paginado<<","<<subcadena<<"-";
+            }
+            if(contador==2)
+            {
+                paginado<<subcadena;
+            }
+            contador++;
+        };
+        contador=0;
+        valores.clear();
+    }
+    lectura.close();
+    paginado.close();
+
+}
+
+void cargarBDgrande()
+{
+    //procesado BD
+    //procesarDb();
+    //carga de datos
+
+    map<string,map<string,float>> matrizRatings;
+    vector <string> cabeceraPersonas;
+    map <string,float> promedioxPer;
+    map <string,float> promedioCant;
+    vector <string> cabeceraProductos;
+    ifstream lctraPagind;
+
+    lctraPagind.open("paginado.csv",ios::in);
+    //lctraPagind.open("paginado1.csv",ios::in);
+    //lctraPagind.open("MovieRatings/Movie_Ratings.csv",ios::in);
+    //lctraPagind.open("matrEjem.csv",ios::in);
+
+    int contadorlinea=0,contadorPersonas=0,contadorCaract=0,contadorProductos=0;
+
+    string producto,persona,cadena,subcadena,productoovaloracion;
+    float puntuacion;
+    string cabecer;
+
+    while (getline(lctraPagind,cadena))
+    {
+        istringstream cadena1(cadena);
+        //cout<<cadena<<endl;
+        bool almacenar=false;
+        if(cadena.size()>0)
+        {
+            while(getline(cadena1,subcadena,','))
+            {
+                if(contadorCaract==0 and esDigito(subcadena))
+                {
+                    almacenar=true;
+                    cabeceraPersonas.push_back(subcadena);
+                    cabecer=subcadena;
+                }
+                if(almacenar==true and contadorCaract>0)
+                {
+                    istringstream subcadena1(subcadena);
+                    int tmp=0;
+                    string libro;
+                    float  valoracion;
+                    while(getline(subcadena1,productoovaloracion,'-'))
+                    {
+                        if(tmp==0)
+                        {
+                            libro=productoovaloracion;
+                        }
+                        if(tmp==1)
+                        {
+                            valoracion=stof(productoovaloracion);
+                        }
+                        tmp++;
+                    }
+
+                    matrizRatings[libro][cabecer]=valoracion;
+                    promedioxPer[cabecer]=promedioxPer[cabecer]+valoracion;
+                    promedioCant[cabecer]=promedioCant[cabecer]+1;
+                }
+                contadorCaract++;
+            };
+        }
+        contadorCaract=0;
+    };
+
+    for(map<string,float>::iterator it=promedioxPer.begin();it!=promedioxPer.end();++it)
+    {
+        //cout<<it->first<<" "<<it->second<<" "<<promedioCant[it->first]<<endl;
+        it->second=it->second/promedioCant[it->first];
+
+    }
+
+    matrizCosenoAjustada(cabeceraPersonas,cabeceraProductos,promedioxPer,matrizRatings);
+
+    lctraPagind.close();
+
+}
+
+
+>>>>>>> Stashed changes
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -134,6 +444,7 @@ void MainWindow::on_manhatan_clicked()
     for(int i=1;i<=(user1-1)*101;i++){
         db>>linea;
     }
+
     for(int i=1;i<=(user2-1)*101;i++){
         db2>>linea2;
     }
@@ -615,7 +926,7 @@ void MainWindow::on_cosenoAjustado_clicked()
     if(ui->dataBase->currentText()=="MovieRatings"){
     string indexUsers[25]={"Patrick C","Heather","Bryan","Patrick T","Thomas","aaron","vanessa","greg","brian","ben","Katherine","Jonathan","Zwe","Erin","Chris","Zak","Matt","Chris","Josh","Amy","Valerie","Gary","Stephen","Jessica","Jeff"};
     string indexMovies[25]={"Alien","Avatar","Blade Runner","Braveheart","Dodgeball","Forest Gump","Gladiator","Jaws","Kazaam","Lord of the Rings","Napolean Dynamite","Old School","Pootie Tang","Pulp Fiction","Scarface","Shawshank Redemption","Snakes on a Plane","Spiderman","Star Wars","The Dark Knight","The Happening","The Matrix","Toy Story","Village","You Got Mail"};
-
+    cargarBDgrande();
     double promedioUser[25]={3.61111,3.93333,3.36364,3.13333,3.68182,3.71429,3.2,4.05556,3.86957,3.75,4,4.05556,3.22727,3.41667,2.875,3.73684,2.66667,3.18182,4.18182,3.05882,3.3913,3.04762,3.33333,3.25,3.63636};
     double promedioMovie[25]={3.86111,3.74667,4.0303,4.05965,3.79437,4.3631,4.16842,3.42398,1.92935,3.625,2.875,4.22531,2.13636,4.20098,3.90625,4.8114,2.31111,3.63258,4.79051,4.58204,1.54891,4.21946,4.41333,2.75,1.97576};
 
