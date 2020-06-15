@@ -109,7 +109,7 @@ double MainWindow::fun_pearson(QVector<double>data1,QVector<double>data2)
 int MainWindow::buscar(QVector<QString>data1,QString dato)
 {
     int resultado=-1;
-    for( int i = 0; i < data1.size(); i++ ) {
+    for( int i=0; i < data1.size(); i++ ) {
         if( data1[i]==dato)
             resultado=i;
      }

@@ -18,6 +18,7 @@ public:
 
 private slots:
 
+
     void on_manhatan_clicked();
 
     void on_euclidiana_clicked();
@@ -36,9 +37,11 @@ private slots:
 
     void on_Matriz_clicked();
 
-    float fun_euclideana(QVector<float>,QVector<float>);
-    float fun_manhatan(QVector<float>,QVector<float>);
-    float fun_cosenoajustado(QVector<float>,QVector<float>);
+    int buscar(QVector<QString>, QString);
+    double fun_euclideana(QVector<double>,QVector<double>);
+    double fun_manhatan(QVector<double>,QVector<double>);
+    double fun_pearson(QVector<double>,QVector<double>);
+    double coseno_ajustar_mr(QVector<QVector<double>>,QVector<double>,int,int);
 
 private:
     Ui::MainWindow *ui;
