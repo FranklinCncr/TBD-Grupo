@@ -42,6 +42,7 @@ private slots:
     double fun_manhatan(QVector<double>,QVector<double>);
     double fun_pearson(QVector<double>,QVector<double>);
     double coseno_ajustar_mr(QVector<QVector<double>>,QVector<double>,int,int);
+    QVector<double>Cos_matriz(QVector<QVector<double>>,QVector<double>);
 
 private:
     Ui::MainWindow *ui;
