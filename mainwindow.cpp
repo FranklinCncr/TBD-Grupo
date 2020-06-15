@@ -1212,7 +1212,33 @@ void MainWindow::on_cosenoAjustado_clicked()
         ui->listResultados->addItem(QString::number(result));
     }
 }
-
+QVector<double> MainWindow::Cos_matriz(QVector<QVector<double>>t_ratings_,QVector<double>t_promedioUser_)
+{
+    QVector<double>matrizCoseno;
+    int cont=0;
+    double sumNum=0, sumDenMov1=0, sumDenMov2=0,result=0;
+    for(int i=0;i<t_ratings_.size()-1;i++){
+        for(int k=i+1;k<t_ratings_.size();k++){
+            for(int j=0;j<t_promedioUser_.size();j++){
+                if(t_ratings_[i][j]!=0 && t_ratings_[k][j]!=0){
+                    sumNum += (t_ratings_[i][j]-t_promedioUser_[j])*(t_ratings_[k][j]-t_promedioUser_[j]);
+                    sumDenMov1 += pow(t_ratings_[i][j]-t_promedioUser_[j],2);
+                    sumDenMov2 += pow(t_ratings_[k][j]-t_promedioUser_[j],2);
+                }
+            }
+            sumDenMov1 = sqrt(sumDenMov1);
+            sumDenMov2 = sqrt(sumDenMov2);
+            result=sumNum/(sumDenMov1*sumDenMov2);
+            ui->tableWidget->setItem(i,k-1,new QTableWidgetItem(QString::number(result)));
+            //cout<<result<<",";
+            matrizCoseno.push_back(result);
+            cont++;
+            sumNum=0, sumDenMov1=0, sumDenMov2=0,result=0;
+        }
+        //cout<<endl;
+    }
+  return matrizCoseno;
+}
 void MainWindow::on_Matriz_clicked()
 {
     ui->listResultados->clear();
