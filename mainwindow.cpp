@@ -611,17 +611,57 @@ void MainWindow::on_cosenoAjustado_clicked()
 {
     ui->listResultados->clear();
 
+    //MOVIE RATINGS
     if(ui->dataBase->currentText()=="MovieRatings"){
+    string indexUsers[25]={"Patrick C","Heather","Bryan","Patrick T","Thomas","aaron","vanessa","greg","brian","ben","Katherine","Jonathan","Zwe","Erin","Chris","Zak","Matt","Chris","Josh","Amy","Valerie","Gary","Stephen","Jessica","Jeff"};
+    string indexMovies[25]={"Alien","Avatar","Blade Runner","Braveheart","Dodgeball","Forest Gump","Gladiator","Jaws","Kazaam","Lord of the Rings","Napolean Dynamite","Old School","Pootie Tang","Pulp Fiction","Scarface","Shawshank Redemption","Snakes on a Plane","Spiderman","Star Wars","The Dark Knight","The Happening","The Matrix","Toy Story","Village","You Got Mail"};
+
+    double promedioUser[25]={3.61111,3.93333,3.36364,3.13333,3.68182,3.71429,3.2,4.05556,3.86957,3.75,4,4.05556,3.22727,3.41667,2.875,3.73684,2.66667,3.18182,4.18182,3.05882,3.3913,3.04762,3.33333,3.25,3.63636};
+    double promedioMovie[25]={3.86111,3.74667,4.0303,4.05965,3.79437,4.3631,4.16842,3.42398,1.92935,3.625,2.875,4.22531,2.13636,4.20098,3.90625,4.8114,2.31111,3.63258,4.79051,4.58204,1.54891,4.21946,4.41333,2.75,1.97576};
+
+    /*Calculo del promedio de puntaje dado por los usuarios
+      int cont=0;
+    for(int i=0;i<25;i++){
+        cont=0;
+        for(int j=0;j<25;j++){
+            if(ratings[j][i]!=0){
+                promedioUser[i]+=ratings[j][i];
+                cont++;
+            }
+        }
+        promedioUser[i]=promedioUser[i]/cont;
+        cout<<promedioUser[i]<<",";
+    }*/
+
     if(ui->tipoCosenoAjustado->currentText()=="prod"){
-        QString movie1_ = ui->user1->text();
-        QString movie2_ = ui->user2->text();
-        cout<<movie1_. toStdString()<<" "<<movie2_.toStdString()<<endl;
+        string strmovie1 = ui->user1->text().toStdString();
+        string strmovie2 = ui->user2->text().toStdString();
         int indexMovie1=-1,indexMovie2=-1;
-        indexMovie1=buscar(indexMovies_,movie1_);
-        indexMovie2=buscar(indexMovies_,movie2_);
-        cout<<indexMovie1<<" "<<indexMovie2<<endl;
+        for(int i=0;i<25;i++){
+            if(indexMovies[i]==strmovie1){
+                indexMovie1=i;
+            }
+            if(indexMovies[i]==strmovie2){
+                indexMovie2=i;
+            }
+        }
+
     if(indexMovie1!=-1 && indexMovie2!=-1){
-        double result=coseno_ajustar_mr(ratings_,promedioUser_,indexMovie1,indexMovie2);
+        double sumNum=0, sumDenMov1=0, sumDenMov2=0,result;
+        for(int j=0;j<25;j++){
+            if(ratings[indexMovie1][j]!=0 && ratings[indexMovie2][j]!=0){
+                sumNum += (ratings[indexMovie1][j]-promedioUser[j])*(ratings[indexMovie2][j]-promedioUser[j]);
+                sumDenMov1 += pow(ratings[indexMovie1][j]-promedioUser[j],2);
+                sumDenMov2 += pow(ratings[indexMovie2][j]-promedioUser[j],2);
+            }
+        }
+        sumDenMov1 = sqrt(sumDenMov1);
+        sumDenMov2 = sqrt(sumDenMov2);
+        result=sumNum/(sumDenMov1*sumDenMov2);
+        //cout<<result<<endl;
+        //cout<<sumNum<<endl;
+        //cout<<sumDenMov1<<endl;
+        //cout<<sumDenMov2<<endl;
         ui->listResultados->addItem(QString::number(result));
     }
     else{
@@ -631,21 +671,234 @@ void MainWindow::on_cosenoAjustado_clicked()
 
     if(ui->tipoCosenoAjustado->currentText()=="user"){
 
-        QString struser1 = ui->user1->text();
-        QString struser2 = ui->user2->text();
+        string struser1 = ui->user1->text().toStdString();
+        string struser2 = ui->user2->text().toStdString();
         int indexUser1=-1,indexUser2=-1;
-        indexUser1=buscar(indexUsers_,struser1);
-        indexUser2=buscar(indexUsers_,struser2);
+        for(int i=0;i<25;i++){
+            if(indexUsers[i]==struser1){
+                indexUser1=i;
+            }
+            if(indexUsers[i]==struser2){
+                indexUser2=i;
+            }
+        }
+
         if(indexUser1!=-1 && indexUser2!=-1){
-           double result=coseno_ajustar_mr(ratings_,promedioUser_,indexUser1,indexUser2);
+            double sumNum=0, sumDenMov1=0, sumDenMov2=0,result;
+            for(int i=0;i<25;i++){
+                if(ratings[i][indexUser1]!=0 && ratings[i][indexUser2]!=0){
+                    sumNum += (ratings[i][indexUser1]-promedioMovie[i])*(ratings[i][indexUser2]-promedioMovie[i]);
+                    sumDenMov1 += pow(ratings[i][indexUser1]-promedioMovie[i],2);
+                    sumDenMov2 += pow(ratings[i][indexUser2]-promedioMovie[i],2);
+                }
+            }
+            sumDenMov1 = sqrt(sumDenMov1);
+            sumDenMov2 = sqrt(sumDenMov2);
+            result=sumNum/(sumDenMov1*sumDenMov2);
+            //cout<<result<<endl;
+            //cout<<sumNum<<endl;
+            //cout<<sumDenMov1<<endl;
+            //cout<<sumDenMov2<<endl;
             ui->listResultados->addItem(QString::number(result));
         }
         else{
             ui->listResultados->addItem("No user");
         }
-
     }
+    }
+    //LIBROS
+    if(ui->dataBase->currentText()=="Libros"){
+        string struser1;
+        string struser2;
+        char cadena[20];
+        float ratingsuser1[2600];
+        int indexuser1[2600],contuser1=0;
+        float ratingsuser2[2600];
+        int indexuser2[2600],contuser2=0;
+        double promrating[2600];
+        int indexprom[2600],contprom=0;
+        string book, rating, user;
+        string bookh;
 
+        //obteniendo los ratings de user 1 y user 2
+        struser1 = ui->user1->text().toStdString();
+        struser2 = ui->user2->text().toStdString();
+        db.open("E:/Proyectos/QT/TBD/TBD/Book/Ratings.csv");
+        for(int i=0;i<433665;i++){//433665
+            db>>cadena;
+            user=cadena;
+            db>>cadena;
+            book=cadena;
+            db>>cadena;
+            rating=cadena;
+            if(book==struser1){
+                //dbs<<user<<" "<<rating<<endl;
+                indexuser1[contuser1]=stoi(user);
+                ratingsuser1[contuser1]=stof(rating);
+                //ui->listResultados->addItem(QString::number(indexuser1[contuser1]));
+                contuser1++;
+            }
+            if(book==struser2){
+                indexuser2[contuser2]=stoi(user);
+                ratingsuser2[contuser2]=stof(rating);
+                //ui->listResultados->addItem(QString::number(indexuser2[contuser2]));
+                contuser2++;
+
+            }
+        }
+        db.close();
+        //obteniendo de promedios necesarios
+        for(int i=0;i<contuser1;i++){
+            for(int j=0;j<contuser2;j++){
+                if(indexuser1[i]==indexuser2[j]){
+                    indexprom[contprom]=indexuser1[i];
+                    contprom++;
+                }
+            }
+        }
+
+        //calculando promedios 0002005018  0887841740
+        double sum=0;
+        int contuserprom=0;
+        for(int p=0;p<contprom;p++){
+            db.open("E:/Proyectos/QT/TBD/TBD/Book/Ratings.csv");
+            for(int i=0;i<1149766;i++){//1149766
+                db>>cadena;
+                user=cadena;
+                db>>cadena;
+                book=cadena;
+                db>>cadena;
+                rating=cadena;
+                if(stoi(user)==indexprom[p]){
+
+                    sum+=stof(rating);
+                    contuserprom++;
+                }
+            }
+            sum=sum/contuserprom;
+            promrating[p]=sum;
+            db.close();
+        }
+
+        //0002005018  0887841740    0425105334 0451524934
+        //calculando el coseno ajustado
+        double result=0;
+        double sumNum=0;
+        double sumDenMov1=0;
+        double sumDenMov2=0;
+        int contp=0;
+        for(int i=0;i<contuser1;i++){
+            for(int j=0;j<contuser2;j++){
+                if(indexuser1[i]==indexuser2[j]){
+                    sumNum += (ratingsuser1[i]-promrating[contp])*(ratingsuser2[j]-promrating[contp]);
+                    sumDenMov1 += pow(ratingsuser1[i]-promrating[contp],2);
+                    sumDenMov2 += pow(ratingsuser2[j]-promrating[contp],2);
+                    //ui->listResultados->addItem(QString::number(indexuser1[i]));
+                    contp++;
+                }
+            }
+        }
+        sumDenMov1 = sqrt(sumDenMov1);
+        sumDenMov2 = sqrt(sumDenMov2);
+        result=sumNum/(sumDenMov1*sumDenMov2);
+        //cout<<result<<endl;
+        //cout<<sumNum<<endl;
+        //cout<<sumDenMov1<<endl;
+        //cout<<sumDenMov2<<endl;
+        ui->listResultados->addItem(QString::number(result));
+    }
+    //MOVIELENS
+    if(ui->dataBase->currentText()=="MovieLensSmall"){
+        db.open("E:/Proyectos/QT/TBD/TBD/MovieLens/ratingschange.csv");
+        string strmovie1,strmovie2;
+        strmovie1 = ui->user1->text().toStdString();
+        strmovie2 = ui->user2->text().toStdString();
+        char cadena[10];
+        string user,movie,rating;
+        int indexmovie1[2600],contmovie1=0;
+        int indexmovie2[2600],contmovie2=0;
+        int indexprom[2600],contprom=0;
+        double ratingmovie1[2600],ratingmovie2[2600],promrating[2600];
+
+        for(int i=0;i<100836;i++){
+            db>>cadena;
+            user=cadena;
+            db>>cadena;
+            movie=cadena;
+            db>>cadena;
+            rating=cadena;
+            if(movie==strmovie1){
+                //dbs<<user<<" "<<rating<<endl;
+                indexmovie1[contmovie1]=stoi(user);
+                ratingmovie1[contmovie1]=stof(rating);
+                //ui->listResultados->addItem(QString::number(indexuser1[contuser1]));
+                contmovie1++;
+            }
+            if(movie==strmovie2){
+                indexmovie2[contmovie1]=stoi(user);
+                ratingmovie2[contmovie1]=stof(rating);
+                //ui->listResultados->addItem(QString::number(indexuser2[contuser2]));
+                contmovie2++;
+            }
+        }
+        db.close();
+        //obteniendo cantidad de promedios necesarios
+        for(int i=0;i<contmovie1;i++){
+            for(int j=0;j<contmovie2;j++){
+                if(indexmovie1[i]==indexmovie2[j]){
+                    indexprom[contprom]=indexmovie1[i];
+                    contprom++;
+                }
+            }
+        }
+
+        //calculando promedios
+        double sum=0;
+        int contuserprom=0;
+        for(int p=0;p<contprom;p++){
+            db.open("E:/Proyectos/QT/TBD/TBD/MovieLens/ratingschange.csv");
+            for(int i=0;i<1149766;i++){//1149766
+                db>>cadena;
+                user=cadena;
+                db>>cadena;
+                movie=cadena;
+                db>>cadena;
+                rating=cadena;
+                if(stoi(user)==indexprom[p]){
+                    sum+=stof(rating);
+                    contuserprom++;
+                }
+            }
+            sum=sum/contuserprom;
+            promrating[p]=sum;
+            db.close();
+        }
+        //calculando el coseno ajustado
+        double result=0;
+        double sumNum=0;
+        double sumDenMov1=0;
+        double sumDenMov2=0;
+        int contp=0;
+        for(int i=0;i<contmovie1;i++){
+            for(int j=0;j<contmovie2;j++){
+                if(indexmovie1[i]==indexmovie2[j]){
+                    sumNum += (ratingmovie1[i]-promrating[contp])*(ratingmovie2[j]-promrating[contp]);
+                    sumDenMov1 += pow(ratingmovie1[i]-promrating[contp],2);
+                    sumDenMov2 += pow(ratingmovie2[j]-promrating[contp],2);
+                    //ui->listResultados->addItem(QString::number(indexuser1[i]));
+                    contp++;
+                }
+            }
+        }
+        sumDenMov1 = sqrt(sumDenMov1);
+        sumDenMov2 = sqrt(sumDenMov2);
+        result=sumNum/(sumDenMov1*sumDenMov2);
+        //cout<<result<<endl;
+        //cout<<sumNum<<endl;
+        //cout<<sumDenMov1<<endl;
+        //cout<<sumDenMov2<<endl;
+        //ui->listResultados->addItem(QString::number(contprom));
+        ui->listResultados->addItem(QString::number(result));
     }
 }
 
@@ -656,32 +909,7 @@ void MainWindow::on_Matriz_clicked()
         double promedioUser[25]={3.61111,3.93333,3.36364,3.13333,3.68182,3.71429,3.2,4.05556,3.86957,3.75,4,4.05556,3.22727,3.41667,2.875,3.73684,2.66667,3.18182,4.18182,3.05882,3.3913,3.04762,3.33333,3.25,3.63636};
         double promedioMovie[25]={3.86111,3.74667,4.0303,4.05965,3.79437,4.3631,4.16842,3.42398,1.92935,3.625,2.875,4.22531,2.13636,4.20098,3.90625,4.8114,2.31111,3.63258,4.79051,4.58204,1.54891,4.21946,4.41333,2.75,1.97576};
         double matrizCoseno[300];//n(n-1)/2
-        double ratings[25][25]={
-            {0,0,2,0,5,4,0,0,4,0,0,0,0,0,2,0,0,4,3,0,0,2,5,0,4},
-            {4,5,5,4,2,0,4,3,0,3,5,4,4,4,1,5,0,0,4,3,2,1,4,0,4},
-            {5,0,0,0,5,4,0,1,5,5,0,0,0,0,5,0,0,3,0,3,3,1,0,0,5},
-            {4,0,5,0,4,4,3,4,4,0,3,4,3,4,2,5,0,4,0,3,4,5,5,0,4},
-            {5,4,3,2,4,0,4,5,3,4,5,5,3,3,3,3,0,3,0,4,3,4,3,0,3},
-            {4,5,4,3,3,0,4,5,5,5,5,5,5,5,3,5,4,5,4,4,5,4,1,4,4},
-            {0,5,5,0,4,4,4,5,5,5,3,4,3,0,3,5,0,3,4,0,3,3,4,0,4},
-            {0,5,4,0,4,0,2,3,3,1,0,3,2,3,2,0,0,5,5,3,2,4,2,3,5},
-            {2,0,3,5,2,0,0,0,1,0,2,2,2,1,1,1,0,0,0,1,1,1,0,1,1},
-            {4,4,3,2,0,5,2,3,5,2,4,4,3,4,3,4,1,4,0,0,5,3,5,3,3},
-            {3,4,1,1,5,1,4,4,4,4,2,3,3,2,1,1,3,1,0,2,5,4,2,2,3},
-            {3,0,4,5,5,0,3,5,4,4,0,5,4,0,5,5,0,4,0,3,3,5,0,2,3},
-            {0,0,1,1,0,0,1,0,1,1,0,0,2,0,3,0,0,1,0,0,0,0,0,0,5},
-            {0,0,4,0,4,3,0,4,5,4,0,5,4,0,5,5,0,5,0,4,3,3,3,4,3},
-            {0,4,0,0,5,4,4,4,0,4,0,4,0,0,3,3,0,2,0,0,4,3,0,0,0},
-            {5,0,5,0,0,5,0,5,5,5,0,0,4,0,4,0,0,4,0,2,5,5,0,0,0},
-            {4,1,2,0,4,0,0,0,3,2,0,0,1,0,3,0,1,3,0,2,1,2,0,2,1},
-            {4,3,4,4,5,3,0,4,4,4,5,3,4,3,2,3,3,2,4,3,5,2,3,3,4},
-            {5,5,4,5,5,3,3,5,5,5,5,5,4,3,4,5,0,5,5,0,5,5,5,5,5},
-            {4,5,5,4,4,0,0,4,4,5,0,5,5,0,3,5,0,4,4,4,5,0,4,5,5},
-            {1,0,0,0,1,0,0,0,2,0,0,0,1,0,1,1,0,0,0,0,1,0,1,0,0},
-            {3,4,3,5,4,4,4,4,5,4,4,5,4,4,4,5,0,2,5,5,4,2,5,0,5},
-            {4,3,3,4,4,5,4,5,5,5,5,5,4,5,3,4,4,4,4,4,5,4,4,5,5},
-            {0,2,3,1,1,0,2,0,4,3,0,0,4,0,3,4,0,1,4,0,2,0,2,0,2},
-            {1,0,1,1,1,3,0,0,3,0,0,2,2,0,0,2,0,1,0,2,2,1,2,0,2}};
+
         if(ui->tipoCosenoAjustado->currentText()=="prod"){
             ui->tableWidget->setRowCount(24);
             ui->tableWidget->setColumnCount(24);
@@ -719,7 +947,6 @@ void MainWindow::on_Matriz_clicked()
 
         }
 
-
         if(ui->tipoCosenoAjustado->currentText()=="user"){
             ui->tableWidget->setRowCount(24);
             ui->tableWidget->setColumnCount(24);
@@ -754,8 +981,94 @@ void MainWindow::on_Matriz_clicked()
                 }
                 //cout<<endl;
             }
+        }
+    }
+    if(ui->dataBase->currentText()=="MovieLensSmall"){
 
+    }
+
+}
+
+void MainWindow::on_predecir_clicked()
+{
+    ui->listResultados->clear();
+    if(ui->dataBase->currentText()=="MovieRatings"){
+        //normalizar los puntajes
+        double ratingsNorm[25][25];
+        for (int i=0;i<25;i++){
+            for(int j=0;j<25;j++){
+                if(ratings[i][j]!=0){
+                    ratingsNorm[i][j]=(2*(ratings[i][j]-1)-(4))/4;
+                    //ui->listResultados->addItem(QString::number(ratingsNorm[i][j]));
+                }
+                else{
+                    ratingsNorm[i][j]=-2;
+                }
+            }
+        }
+        //Matriz de similitud
+        double matrizCoseno[25][25];//n(n-1)/2
+        double promedioUser[25]={3.61111,3.93333,3.36364,3.13333,3.68182,3.71429,3.2,4.05556,3.86957,3.75,4,4.05556,3.22727,3.41667,2.875,3.73684,2.66667,3.18182,4.18182,3.05882,3.3913,3.04762,3.33333,3.25,3.63636};
+
+        string indexUsers[25]={"Patrick C","Heather","Bryan","Patrick T","Thomas","aaron","vanessa","greg","brian","ben","Katherine","Jonathan","Zwe","Erin","Chris","Zak","Matt","Chris","Josh","Amy","Valerie","Gary","Stephen","Jessica","Jeff"};
+        string indexMovies[25]={"Alien","Avatar","Blade Runner","Braveheart","Dodgeball","Forest Gump","Gladiator","Jaws","Kazaam","Lord of the Rings","Napolean Dynamite","Old School","Pootie Tang","Pulp Fiction","Scarface","Shawshank Redemption","Snakes on a Plane","Spiderman","Star Wars","The Dark Knight","The Happening","The Matrix","Toy Story","Village","You Got Mail"};
+
+        int cont=0;
+        double sumNum=0, sumDenMov1=0, sumDenMov2=0,result=0;
+        for(int i=0;i<25;i++){
+            for(int k=0;k<25;k++){
+                for(int j=0;j<25;j++){
+                    if(ratings[i][j]!=0 && ratings[k][j]!=0){
+                        sumNum += (ratings[i][j]-promedioUser[j])*(ratings[k][j]-promedioUser[j]);
+                        sumDenMov1 += pow(ratings[i][j]-promedioUser[j],2);
+                        sumDenMov2 += pow(ratings[k][j]-promedioUser[j],2);
+                    }
+                }
+                sumDenMov1 = sqrt(sumDenMov1);
+                sumDenMov2 = sqrt(sumDenMov2);
+                result=sumNum/(sumDenMov1*sumDenMov2);
+                //ui->tableWidget->setItem(i,k,new QTableWidgetItem(QString::number(result)));
+                //ui->tableWidget->setItem(k-1,i,new QTableWidgetItem(QString::number(result)));
+                //cout<<result<<",";
+                matrizCoseno[i][k]=result;
+                cont++;
+                sumNum=0, sumDenMov1=0, sumDenMov2=0,result=0;
+            }
+            //cout<<endl;
+        }
+        string struser = ui->user1->text().toStdString();
+        string strmovie = ui->user2->text().toStdString();
+        int indexUser=-1,indexMovie=-1;
+        for(int i=0;i<25;i++){
+            if(indexMovies[i]==strmovie){
+                indexMovie=i;
+            }
+        }
+        for(int i=0;i<25;i++){
+            if(indexUsers[i]==struser){
+                indexUser=i;
+            }
+        }
+        if(indexUser>=0 && indexMovie>=0){
+            double sumNumPred=0;
+            double sumDenPred=0;
+            double resultPred=0;
+            for(int i=0;i<25;i++){
+                if(ratingsNorm[i][indexUser]>-2){
+                    sumNumPred += ratingsNorm[i][indexUser]*matrizCoseno[indexMovie][i];
+                    sumDenPred += abs(matrizCoseno[indexMovie][i]);
+                }
+            }
+            resultPred=sumNumPred/sumDenPred;
+            //desnormalizar
+            resultPred=((resultPred+1)*(4)/2)+1;
+            ui->listResultados->addItem(QString::number(resultPred));
+
+        }
+        else{
+            ui->listResultados->addItem("User o Movie no encontrados");
         }
 
     }
+
 }
