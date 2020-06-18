@@ -1407,5 +1407,170 @@ void MainWindow::on_predecir_clicked()
         }
 
     }
+    //BASE DE DATOS LIBROS
+    if(ui->dataBase->currentText()=="Libros"){
+        string userin, bookin;
+        userin = ui->user1->text().toStdString();
+        bookin = ui->user2->text().toStdString();
+        db.open("E:/Proyectos/QT/TBD/TBD/Book/Ratings.csv");
+        char cadena[20];
+        double ratingsUser[2600],nRatingsUser[2600];
+        int contRatings=0;
+        string codesBook[2600]; string struser,strbook,strrating;
+        double max=-1,min=11;
+        //Obteniendo ratings, max y min de user
+        for(int i=0;i<433665;i++){
+            db>>cadena;
+            struser=cadena;
+            db>>cadena;
+            strbook=cadena;
+            db>>cadena;
+            strrating=cadena;
+            if(struser==userin){
+                ratingsUser[contRatings]=atof(strrating.c_str());
+                codesBook[contRatings]=strbook;
+                if(ratingsUser[contRatings]>max){
+                    max=ratingsUser[contRatings];
+                }
+                if(ratingsUser[contRatings]<min){
+                    min=ratingsUser[contRatings];
+                }
+                contRatings++;
+            }
+        }
+        db.close();
+        //ui->listResultados->addItem(QString::number(contRatings));
+        //ui->listResultados->addItem(QString::number(max));
+        //ui->listResultados->addItem(QString::number(min));
+
+        double sumN=0,sumD=0;
+        string struser1;
+        string struser2;
+        float ratingsuser1[2600];
+        int indexuser1[2600],contuser1=0;
+        float ratingsuser2[2600];
+        int indexuser2[2600],contuser2=0;
+        double promrating[2600];
+        int indexprom[2600],contprom=0;
+        string book, rating, user;
+        string bookh;
+        double sum=0;
+        int contuserprom=0;
+        double result=0;
+        double sumNum=0;
+        double sumDenMov1=0;
+        double sumDenMov2=0;
+        //Normalizar puntajes de user
+        for(int i=0;i<contRatings;i++){
+            nRatingsUser[i]=(2*(ratingsUser[i]-min)-(max-min))/(max-min);
+            //ui->listResultados->addItem(QString::number(ratingsUser[i]));
+
+            //Calculando coseno ajustado de los valores necesarios
+
+            //Pasando los valores de para calcular el cosenoajustado
+            struser1 = bookin;
+            struser2 = codesBook[i];
+            //ui->listResultados->addItem(QString::fromStdString(struser1));
+           // ui->listResultados->addItem(QString::fromStdString(struser2));
+
+            contuser1=0;
+            contuser2=0;
+            contprom=0;
+            db.open("E:/Proyectos/QT/TBD/TBD/Book/Ratings.csv");
+            for(int i=0;i<433665;i++){//433665
+                db>>cadena;
+                user=cadena;
+                db>>cadena;
+                book=cadena;
+                db>>cadena;
+                rating=cadena;
+                if(book==struser1){
+                    //dbs<<user<<" "<<rating<<endl;
+                    indexuser1[contuser1]=stoi(user);
+                    ratingsuser1[contuser1]=stof(rating);
+                    //ui->listResultados->addItem(QString::number(indexuser1[contuser1]));
+                    contuser1++;
+                }
+                if(book==struser2){
+                    indexuser2[contuser2]=stoi(user);
+                    ratingsuser2[contuser2]=stof(rating);
+                    //ui->listResultados->addItem(QString::number(indexuser2[contuser2]));
+                    contuser2++;
+
+                }
+            }
+            db.close();
+            //obteniendo de promedios necesarios
+            for(int i=0;i<contuser1;i++){
+                for(int j=0;j<contuser2;j++){
+                    if(indexuser1[i]==indexuser2[j]){
+                        indexprom[contprom]=indexuser1[i];
+                        contprom++;
+                    }
+                }
+            }
+
+            //calculando promedios 0002005018  0887841740
+            sum=0;
+            contuserprom=0;
+            for(int p=0;p<contprom;p++){
+                db.open("E:/Proyectos/QT/TBD/TBD/Book/Ratings.csv");
+                for(int i=0;i<433665;i++){//1149766
+                    db>>cadena;
+                    user=cadena;
+                    db>>cadena;
+                    book=cadena;
+                    db>>cadena;
+                    rating=cadena;
+                    if(stoi(user)==indexprom[p]){
+                        sum+=stof(rating);
+                        contuserprom++;
+                    }
+                }
+                sum=sum/contuserprom;
+                promrating[p]=sum;
+                db.close();
+            }
+
+            //0002005018  0887841740    0425105334 0451524934
+            //calculando el coseno ajustado
+
+            result=0;
+            sumNum=0;
+            sumDenMov1=0;
+            sumDenMov2=0;
+            int contp=0;
+            for(int i=0;i<contuser1;i++){
+                for(int j=0;j<contuser2;j++){
+                    if(indexuser1[i]==indexuser2[j]){
+                        sumNum += (ratingsuser1[i]-promrating[contp])*(ratingsuser2[j]-promrating[contp]);
+                        sumDenMov1 += pow(ratingsuser1[i]-promrating[contp],2);
+                        sumDenMov2 += pow(ratingsuser2[j]-promrating[contp],2);
+                        //ui->listResultados->addItem(QString::number(indexuser1[i]));
+                        contp++;
+                    }
+                }
+            }
+            sumDenMov1 = sqrt(sumDenMov1);
+            sumDenMov2 = sqrt(sumDenMov2);
+            if(sumDenMov1*sumDenMov2==0){
+                result=0;
+                //ui->listResultados->addItem("No tienen");
+            }
+            else{
+                result=sumNum/(sumDenMov1*sumDenMov2);
+                //ui->listResultados->addItem(QString::number(result));
+            }
+
+            sumN+=result * nRatingsUser[i];
+            sumD+=abs(result);
+        }
+        result=sumN/sumD;
+        ui->listResultados->addItem(QString::number(result));
+        //desnormalizar
+        result=((result+1)*(max-min)/2)+min;
+        ui->listResultados->addItem(QString::number(result));
+
+    }
 
 }
