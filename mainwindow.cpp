@@ -3,24 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-<<<<<<< Updated upstream
-#include <QVector>
-#include <stdlib.h>
-=======
 
-#include <string.h>
-#include <vector>
-#include <map>
-#include <string>
-#include <iomanip>
-#include <sstream>
-#include <math.h>
-#include <cctype>
-
-
-
-
->>>>>>> Stashed changes
 using namespace std;
 ifstream db;
 ifstream db2;
@@ -32,14 +15,7 @@ double d;
 double d2;
 char linea[10];
 char linea2[10];
-<<<<<<< Updated upstream
-//movie_ratings
-QVector<QString>indexUsers_={"Patrick C","Heather","Bryan","Patrick T","Thomas","aaron","vanessa","greg","brian","ben","Katherine","Jonathan","Zwe","Erin","Chris","Zak","Matt","Chris","Josh","Amy","Valerie","Gary","Stephen","Jessica","Jeff"};
-QVector<QString> indexMovies_={"Alien","Avatar","Blade Runner","Braveheart","Dodgeball","Forest Gump","Gladiator","Jaws","Kazaam","Lord of the Rings","Napolean Dynamite","Old School","Pootie Tang","Pulp Fiction","Scarface","Shawshank Redemption","Snakes on a Plane","Spiderman","Star Wars","The Dark Knight","The Happening","The Matrix","Toy Story","Village","You Got Mail"};
-QVector<double>promedioUser_={3.61111,3.93333,3.36364,3.13333,3.68182,3.71429,3.2,4.05556,3.86957,3.75,4,4.05556,3.22727,3.41667,2.875,3.73684,2.66667,3.18182,4.18182,3.05882,3.3913,3.04762,3.33333,3.25,3.63636};
-QVector<double>promedioMovie_={3.86111,3.74667,4.0303,4.05965,3.79437,4.3631,4.16842,3.42398,1.92935,3.625,2.875,4.22531,2.13636,4.20098,3.90625,4.8114,2.31111,3.63258,4.79051,4.58204,1.54891,4.21946,4.41333,2.75,1.97576};
-
-QVector<QVector<double>>ratings_={
+double ratings[25][25]={
     {0,0,2,0,5,4,0,0,4,0,0,0,0,0,2,0,0,4,3,0,0,2,5,0,4},
     {4,5,5,4,2,0,4,3,0,3,5,4,4,4,1,5,0,0,4,3,2,1,4,0,4},
     {5,0,0,0,5,4,0,1,5,5,0,0,0,0,5,0,0,3,0,3,3,1,0,0,5},
@@ -66,308 +42,125 @@ QVector<QVector<double>>ratings_={
     {0,2,3,1,1,0,2,0,4,3,0,0,4,0,3,4,0,1,4,0,2,0,2,0,2},
     {1,0,1,1,1,3,0,0,3,0,0,2,2,0,0,2,0,1,0,2,2,1,2,0,2}};
 
-//end data movie_ratings
-const float INF = numeric_limits<float>::infinity();
-float resultado=0;//para resultado de distancias
-string xlinea;
-=======
-
-bool esDigito(string cadena)
-{
-    for (int i=0;i<cadena.size();i++)
-    {
-        if (!isdigit(cadena[i]) and cadena[i]!='.')
-            return false;
+float get_promedio(map<string,float> mapa) {
+    map<string, float>::iterator itr;
+    float cc=0;
+    float den=0;
+    for (itr = mapa.begin(); itr != mapa.end(); ++itr) {
+        den+=itr->second;
+        cc++;
     }
-    return true;
+    if(cc>0) {
+        return (den/cc);
+    }
+    else {
+        return -1;
+    }
 }
 
-float cosenoAjustada(map <string,float> product1, map <string,float> product2, map<string,float> promedios)
-{
-    float sumat1x2=0;
-    float sumat1ala2=0;
-    float sumat2ala2=0;
+void readdbtypea(map<string,map<string,float> > &maps,const char* name,int id1,int id2,int idval) {
+    string tm;
+    fstream arch(name,std::ios::in);
+    int cont;
+    if(!arch) {
+        cout<<"Error al abrir archivo"<<endl;
+    }
+    while(getline(arch, tm)) {
+        cont=0;
+        string delimiter = " ";
+        size_t pos = 0;
+        string token;
+        string tmpa,tmpb;
+        float tmpc;
 
-    for(map<string,float>::iterator it=product1.begin();it!=product1.end();++it)
-    {
-        //cout<<it->second<<"->"<<it->first<<endl;
-        if(product2[it->first]!=0)
-        {
-            sumat1x2=sumat1x2+((product1[it->first]-promedios[it->first])*(product2[it->first]-promedios[it->first]));
-            cout<<it->first<<"\t"<<"("<<product1[it->first]<<"-"<<promedios[it->first]<<")";
-            cout<<"("<<product2[it->first]<<"-"<<promedios[it->first]<<")";
-            sumat1ala2=sumat1ala2+pow( product1[it->first]-promedios[it->first],2);
-            sumat2ala2=sumat2ala2+pow( product2[it->first]-promedios[it->first],2);
+        while ((pos = tm.find(delimiter)) != string::npos) {
+            token = tm.substr(0, pos);
+            if (cont==id1) {
+                tmpa=token;
+            }
+            if (cont==id2) {
+                tmpb=token;
+            }
+            if (cont==idval) {
+                tmpc=atof(token.c_str());
+            }
+            tm.erase(0, pos + delimiter.length());
+            cont++;
         }
-        cout<<" "<<endl;
+        maps[tmpa][tmpb]=tmpc;
 
     }
-
-    return sumat1x2/(sqrt(sumat1ala2)*sqrt(sumat2ala2));
+    arch.close();
 }
 
-void matrizCosenoAjustada(vector <string> personas, vector <string> productos, map<string,float> promedios,map<string,map<string,float>> matrizRating)
-{
-    /*
-    int cantpersonas=personas.size();
-    int cantproduct=productos.size();
+float manhattanTA(map<string,float> usr1,map<string,float> usr2) {
+    map<string, float>::iterator itr;
+    map<string, float>::iterator itr2;
+    float res=0.;
+    for (itr = usr1.begin(); itr != usr1.end(); ++itr) {
+        for (itr2 = usr2.begin(); itr2 != usr2.end(); ++itr2) {
+            if(itr->first==itr2->first) {
+                float tmp=itr->second - itr2->second;
+                if(tmp<0) {
+                    tmp=tmp*(-1);
+                }
+                res+=tmp;
 
-    float **matrizDistancia = new float*[cantproduct];
-    for (int i = 0; i < cantproduct; i++)
-    {
-        matrizDistancia[i] = new float[cantproduct];
-    };
-    */
-    ofstream matrizado;
-    string cadena,subcadena;
-
-    //matrizado.open("matrizResultante.csv",ios::out);
-    matrizado.open("matrizResultante1.csv",ios::out);
-    //cosenoAjustada(matrizRating[productos[0]],matrizRating[productos[1]],promedios);
-    for (int i=0;i<193609;i++)
-    {
-        for(int j=0;j<193609;j++)
-        {
-            if (j>=i)
-            {
-                //matrizDistancia[i][j]=cosenoAjustada(matrizRating[productos[i]],matrizRating[productos[j]],promedios);
-                //cout<<productos[i]<<" "<<productos[j]<<" "<<matrizDistancia[i][j]<<" "<<endl;
-                //matrizado<<cosenoAjustada(matrizRating[productos[i]],matrizRating[productos[j]],promedios)<<",";
-                matrizado<<cosenoAjustada(matrizRating[to_string(i)],matrizRating[to_string(j)],promedios)<<",";
             }
-            else
-            {
-                //matrizDistancia[i][j]=-1;
-                matrizado<<-1<<",";
-            }
-
         }
-        matrizado<<endl;
-        cout<<endl;
     }
-
+    return res;
 }
 
-
-void cargarBD()
-{
-    map<string,map<string,float>> matrizRatings;
-    vector <string> cabeceraPersonas;
-    map <string,float> promedioxPer;
-    map <string,float> promedioCant;
-    vector <string> cabeceraProductos;
-    ifstream lctraPagind;
-    //lctraPagind.open("paginado.csv",ios::in);
-    //lctraPagind.open("paginado1.csv",ios::in);
-    lctraPagind.open("MovieRatings/Movie_Ratings.csv",ios::in);
-    //lctraPagind.open("matrEjem.csv",ios::in);
-
-    int contadorlinea=0,contadorPersonas=0,contadorCaract=0,contadorProductos=0;
-
-    string producto,persona,cadena,subcadena;
-    float puntuacion;
-    string cabecer;
-
-    while (getline(lctraPagind,cadena))
-    {
-        if(contadorlinea==0)
-        {
-            istringstream cadena1(cadena);
-            //cout<<cadena<<endl;
-            while(getline(cadena1,subcadena,','))
-            {
-                if(subcadena.size()>0)
-                cabeceraPersonas.push_back(subcadena);
+float euclidianaTA(map<string,float> usr1,map<string,float> usr2) {
+    map<string, float>::iterator itr;
+    map<string, float>::iterator itr2;
+    float res=0.;
+    for (itr = usr1.begin(); itr != usr1.end(); ++itr) {
+        for (itr2 = usr2.begin(); itr2 != usr2.end(); ++itr2) {
+            if(itr->first==itr2->first) {
+                float tmp=itr->second - itr2->second;
+                tmp=pow(tmp,2);
+                res+=tmp;
             }
-
         }
-        else
-        {
-            istringstream cadena1(cadena);
-            //cout<<cadena<<endl;
-            bool almacenar=false;
-            while(getline(cadena1,subcadena,','))
-            {
-                if(contadorCaract==0)
-                {
-                    cabeceraProductos.push_back(subcadena);
-                    producto=subcadena;
-                }
-                else if(subcadena.size()>0)
-                {
-                    puntuacion=stof(subcadena);
-                    persona=cabeceraPersonas[contadorCaract-1];
-                    //cout <<producto<<" "<<persona<<" "<<puntuacion<<endl;
-                    matrizRatings[producto][persona]=puntuacion;
+    }
+    res=sqrt(res);
+    return res;
+}
 
-                    promedioxPer[persona]=promedioxPer[persona]+puntuacion;
-                    promedioCant[persona]=promedioCant[persona]+1;
-                }
-                contadorCaract++;
-            };
+float pearsonTA(map<string,float> usr1,map<string,float> usr2) {
+    map<string, float>::iterator itr;
+    map<string, float>::iterator itr2;
+    float res=0.;
+    float sx,sy,sxy,sx2,sy2;
+    float n;
+    sx=sy=sxy=sx2=sy2=0;
+    for (itr = usr1.begin(); itr != usr1.end(); ++itr) {
+        for (itr2 = usr2.begin(); itr2 != usr2.end(); ++itr2) {
+            if(itr->first==itr2->first) {
+                sx+=itr->second;
+                sy+=itr2->second;
+                sx2+=pow(itr->second,2);
+                sy2+=pow(itr2->second,2);
+                sxy+=(itr->second*itr2->second);
+                n+=1;
+            }
         }
-        contadorlinea++;
-        contadorCaract=0;
-    };
-    //cout<<matrizRatings[cabeceraProductos[1]][cabeceraPersonas[9]]<<endl;
-    //cout<<matrizRatings["\"Avatar\""]["\"ben\""]<<endl;
-
-    for(map<string,float>::iterator it=promedioxPer.begin();it!=promedioxPer.end();++it)
-    {
-        it->second=it->second/promedioCant[it->first];
     }
-
-    matrizCosenoAjustada(cabeceraPersonas,cabeceraProductos,promedioxPer,matrizRatings);
-
-    lctraPagind.close();
-
-
-}
-
-//matriz grande
-
-void procesarDb()
-{
-    ifstream lectura;
-    ofstream paginado;
-    string cadena,subcadena;
-
-    //lectura.open("cr.csv",ios::in);
-    lectura.open("libimseti/ratings.dat",ios::in);
-    //lectura.open("ml-latest-small/ratings.csv",ios::in);
-    //paginado.open("paginado.csv",ios::out);
-    paginado.open("paginado1.csv",ios::out);
-
-    //proceado ratings
-
-    string persona="";
-    int contador=0;
-
-    while (getline(lectura,cadena))
-    {
-
-        istringstream cadena1(cadena);
-        vector<string> valores;
-
-        while(getline(cadena1,subcadena,','))
-        {
-            //bcadena=quitarComill(subcadena);
-            if(contador==0)
-            {
-                if(persona!=subcadena)
-                {
-                    paginado<<endl;
-                    paginado<<subcadena;
-                    persona=subcadena;
-                }
-
-            }
-            if(contador==1)
-            {
-                paginado<<","<<subcadena<<"-";
-            }
-            if(contador==2)
-            {
-                paginado<<subcadena;
-            }
-            contador++;
-        };
-        contador=0;
-        valores.clear();
-    }
-    lectura.close();
-    paginado.close();
-
-}
-
-void cargarBDgrande()
-{
-    //procesado BD
-    //procesarDb();
-    //carga de datos
-
-    map<string,map<string,float>> matrizRatings;
-    vector <string> cabeceraPersonas;
-    map <string,float> promedioxPer;
-    map <string,float> promedioCant;
-    vector <string> cabeceraProductos;
-    ifstream lctraPagind;
-
-    lctraPagind.open("paginado.csv",ios::in);
-    //lctraPagind.open("paginado1.csv",ios::in);
-    //lctraPagind.open("MovieRatings/Movie_Ratings.csv",ios::in);
-    //lctraPagind.open("matrEjem.csv",ios::in);
-
-    int contadorlinea=0,contadorPersonas=0,contadorCaract=0,contadorProductos=0;
-
-    string producto,persona,cadena,subcadena,productoovaloracion;
-    float puntuacion;
-    string cabecer;
-
-    while (getline(lctraPagind,cadena))
-    {
-        istringstream cadena1(cadena);
-        //cout<<cadena<<endl;
-        bool almacenar=false;
-        if(cadena.size()>0)
-        {
-            while(getline(cadena1,subcadena,','))
-            {
-                if(contadorCaract==0 and esDigito(subcadena))
-                {
-                    almacenar=true;
-                    cabeceraPersonas.push_back(subcadena);
-                    cabecer=subcadena;
-                }
-                if(almacenar==true and contadorCaract>0)
-                {
-                    istringstream subcadena1(subcadena);
-                    int tmp=0;
-                    string libro;
-                    float  valoracion;
-                    while(getline(subcadena1,productoovaloracion,'-'))
-                    {
-                        if(tmp==0)
-                        {
-                            libro=productoovaloracion;
-                        }
-                        if(tmp==1)
-                        {
-                            valoracion=stof(productoovaloracion);
-                        }
-                        tmp++;
-                    }
-
-                    matrizRatings[libro][cabecer]=valoracion;
-                    promedioxPer[cabecer]=promedioxPer[cabecer]+valoracion;
-                    promedioCant[cabecer]=promedioCant[cabecer]+1;
-                }
-                contadorCaract++;
-            };
-        }
-        contadorCaract=0;
-    };
-
-    for(map<string,float>::iterator it=promedioxPer.begin();it!=promedioxPer.end();++it)
-    {
-        //cout<<it->first<<" "<<it->second<<" "<<promedioCant[it->first]<<endl;
-        it->second=it->second/promedioCant[it->first];
-
-    }
-
-    matrizCosenoAjustada(cabeceraPersonas,cabeceraProductos,promedioxPer,matrizRatings);
-
-    lctraPagind.close();
-
+    res=sxy-((sx*sy)/n);
+    res=res/((sqrt(sx2-(pow(sx,2)/n)))*(sqrt(sy2-(pow(sy,2)/n))));
+    return res;
 }
 
 
->>>>>>> Stashed changes
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    chunk=false;
     ui->setupUi(this);
+
 }
 
 MainWindow::~MainWindow()
@@ -375,116 +168,87 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-double MainWindow::fun_euclideana(QVector<double>data1,QVector<double>data2)
-{
-    resultado=0;
-    for(int i=1;i<data1.size();i++){
-        resultado=resultado+pow(data1[i]+data2[i],2);
-    }
-    resultado=pow(resultado,0.5);
-    return resultado;
-}
-double MainWindow::fun_manhatan(QVector<double>data1,QVector<double>data2)
-{
-    resultado=0;
-    for(int i=1;i<data1.size();i++){
-        resultado=resultado+abs(data1[i]-data2[i]);
-    }
-    return resultado;
-}
-double MainWindow::fun_pearson(QVector<double>data1,QVector<double>data2)
-{
-    float suma1 = 0, suma2 = 0, suma3 = 0, suma4 = 0, suma5 = 0;
-        float multi = 0, raiz1 = 0, raiz2 = 0, rpta = 0;
-        for(int i = 1; i < data1.size(); ++i)
-        {
-            if(data1[i] != INF && data2[i] != INF)
-            {
-                suma1 += data1[i] * data2[i];
-                suma2 += data1[i];
-                suma3 += data2[i];
-                suma4 += data1[i];
-                suma5 += data2[i];
-            }
-        }
-        suma4=pow(suma4,2);
-        suma5=pow(suma5,2);
-        multi += (suma2 * suma3)/data1.size();
-        raiz1 += suma4 - (pow(suma2,2))/data1.size();
-        raiz2 += suma5 - (pow(suma3,2))/data1.size();
-        raiz1 = sqrt(raiz1);
-        raiz2 = sqrt(raiz2);
-        return rpta = (suma1 - multi)/(raiz1*raiz2);
-}
-int MainWindow::buscar(QVector<QString>data1,QString dato)
-{
-    int resultado=-1;
-    for( int i = 0; i < data1.size(); i++ ) {
-        if( data1[i]==dato)
-            resultado=i;
-     }
-     if (resultado!=0)
-         return resultado;
-     else
-         return -1;
-}
-
 void MainWindow::on_manhatan_clicked()
 {
     ui->listResultados->clear();
 
     //calculo con la base de datos Jester
-    if(ui->dataBase->currentText()=="Jester"){
-    db.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
-    db2.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
-    bool ok;
-    user1 = ui->user1->text().toInt(&ok);
-    user2 = ui->user2->text().toInt(&ok);
+    if(ui->dataBase->currentText()=="Jester") {
+        db.open("./Jester/jester.csv");
+        db2.open("./Jester/jester.csv");
+        bool ok;
+        user1 = ui->user1->text().toInt(&ok);
+        user2 = ui->user2->text().toInt(&ok);
 
-    for(int i=1;i<=(user1-1)*101;i++){
-        db>>linea;
-    }
-
-    for(int i=1;i<=(user2-1)*101;i++){
-        db2>>linea2;
-    }
-    db>>linea;
-    db2>>linea2;
-    cout<<linea<<" "<<linea2<<endl;
-
-    double r=0;
-    for(int i = 0;i<101;i++){
-        db>>linea;
-        db2>>linea2;
-        str=linea;
-        d=atof(str.c_str());
-        str=linea2;
-        d2=atof(str.c_str());
-        if(d!=0 && d2!=0){
-            r+=abs(d - d2);
+        for(int i=1;i<=(user1-1)*101;i++){
+            db>>linea;
         }
-    }
-    ui->listResultados->addItem(QString::number(r));
-    //ui->lineEdit->setText(QString::number(r));
-    db.close();
-    db2.close();
-    r=0;
+        for(int i=1;i<=(user2-1)*101;i++){
+            db2>>linea2;
+        }
+        db>>linea;
+        db2>>linea2;
+        cout<<linea<<" "<<linea2<<endl;
+
+        double r=0;
+        for(int i = 0;i<101;i++){
+            db>>linea;
+            db2>>linea2;
+            str=linea;
+            d=atof(str.c_str());
+            str=linea2;
+            d2=atof(str.c_str());
+            if(d!=0 && d2!=0){
+                r+=abs(d - d2);
+            }
+        }
+        ui->listResultados->addItem(QString::number(r));
+        //ui->lineEdit->setText(QString::number(r));
+        db.close();
+        db2.close();
+        r=0;
     }
 
     if(ui->dataBase->currentText()=="MovieRatings"){
-        bool ok;
-        QString user_1 = ui->user1->text();
-        QString user_2 = ui->user2->text();
-        int pos1=buscar(indexUsers_,user_1);
-        int pos2=buscar(indexUsers_,user_2);
-
-        if (pos1!=-1 && pos2!=-1){
-            cout<<fun_manhatan(ratings_[pos1],ratings_[pos2])<<endl;
+        string strUser1 = ui->user1->text().toStdString();
+        string strUser2 = ui->user2->text().toStdString();
+        int x=-1,y=-1;
+        string indexUsers[25]={"Patrick C","Heather","Bryan","Patrick T","Thomas","aaron","vanessa","greg","brian","ben","Katherine","Jonathan","Zwe","Erin","Chris","Zak","Matt","Chris","Josh","Amy","Valerie","Gary","Stephen","Jessica","Jeff"};
+        for(int i=0;i<25;i++){
+            if(indexUsers[i]==strUser1){
+                x=i;
+            }
+            if(indexUsers[i]==strUser2){
+                y=i;
+            }
         }
+        double r=0;
+        if(x>=0 && y>=0){
+            for(int i=0;i<25;i++){
+                if(ratings[i][x]!=0 && ratings[i][y]!=0){
+                    r+=abs(ratings[i][x] - ratings[i][y]);
+                }
+            }
+            ui->listResultados->addItem(QString::number(r));
+        }
+        else{
+            ui->listResultados->addItem("Usuarios no encontrados");
+        }
+
     }
 
     if(ui->dataBase->currentText()=="MovieLensSmall"){
-
+        readdbtypea(mapa,"./MovieLens/ratings.csv",0,1,2);
+        string user1 = ui->user1->text().toStdString();
+        string user2 = ui->user2->text().toStdString();
+        float result=manhattanTA(mapa[user1],mapa[user2]);
+        if(result==0) {
+            ui->listResultados->addItem("Usuarios no encontrados");
+        }
+        else {
+            ui->listResultados->addItem(QString::number(result));
+        }
+        mapa.clear();
     }
 
     if(ui->dataBase->currentText()=="Libros"){
@@ -499,6 +263,8 @@ void MainWindow::on_euclidiana_clicked()
 
     //calculo con la base de datos Jester
     if(ui->dataBase->currentText()=="Jester"){
+    db.open("./Jester/jester.csv");
+    db2.open("./Jester/jester.csv");
     bool ok;
     user1 = ui->user1->text().toInt(&ok);
     user2 = ui->user2->text().toInt(&ok);
@@ -533,16 +299,21 @@ void MainWindow::on_euclidiana_clicked()
     }
 
     if(ui->dataBase->currentText()=="MovieRatings"){
-    db.open("C:/Users/Manuel/Documents/GitHub/TBD-Grupo/MovieRatings/Movie_Ratings.csv");
-    while(db.good()){
-        getline(db,xlinea,',');
 
-        }
-    db.close();
     }
 
     if(ui->dataBase->currentText()=="MovieLensSmall"){
-
+        readdbtypea(mapa,"./MovieLens/ratings.csv",0,1,2);
+        string user1 = ui->user1->text().toStdString();
+        string user2 = ui->user2->text().toStdString();
+        float result=euclidianaTA(mapa[user1],mapa[user2]);
+        if(result==0) {
+            ui->listResultados->addItem("Usuarios no encontrados");
+        }
+        else {
+            ui->listResultados->addItem(QString::number(result));
+        }
+        mapa.clear();
     }
 
     if(ui->dataBase->currentText()=="Libros"){
@@ -556,8 +327,8 @@ void MainWindow::on_minkowsky_clicked()
 
     //calculo con la base de datos Jester
     if(ui->dataBase->currentText()=="Jester"){
-    db.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
-    db2.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
+    db.open("./Jester/jester.csv");
+    db2.open("./Jester/jester.csv");
     bool ok;
     user1 = ui->user1->text().toInt(&ok);
     user2 = ui->user2->text().toInt(&ok);
@@ -597,7 +368,20 @@ void MainWindow::on_minkowsky_clicked()
     }
 
     if(ui->dataBase->currentText()=="MovieLensSmall"){
-
+        int p = ui->valorMink->text().toInt();
+        if (p==1) {
+            readdbtypea(mapa,"./MovieLens/ratings.csv",0,1,2);
+            string user1 = ui->user1->text().toStdString();
+            string user2 = ui->user2->text().toStdString();
+            float result=manhattanTA(mapa[user1],mapa[user2]);
+            if(result==0) {
+                ui->listResultados->addItem("Usuarios no encontrados");
+            }
+            else {
+                ui->listResultados->addItem(QString::number(result));
+            }
+            mapa.clear();
+        }
     }
 
     if(ui->dataBase->currentText()=="Libros"){
@@ -611,8 +395,8 @@ void MainWindow::on_pearson_clicked()
 
     //calculo con la base de datos Jester
     if(ui->dataBase->currentText()=="Jester"){
-    db.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
-    db2.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
+    db.open("./Jester/jester.csv");
+    db2.open("./Jester/jester.csv");
     bool ok;
     user1 = ui->user1->text().toInt(&ok);
     user2 = ui->user2->text().toInt(&ok);
@@ -669,7 +453,17 @@ void MainWindow::on_pearson_clicked()
     }
 
     if(ui->dataBase->currentText()=="MovieLensSmall"){
-
+        readdbtypea(mapa,"./MovieLens/ratings.csv",0,1,2);
+        string user1 = ui->user1->text().toStdString();
+        string user2 = ui->user2->text().toStdString();
+        float result=pearsonTA(mapa[user1],mapa[user2]);
+        if(result==0) {
+            ui->listResultados->addItem("Usuarios no encontrados");
+        }
+        else {
+            ui->listResultados->addItem(QString::number(result));
+        }
+        mapa.clear();
     }
 
     if(ui->dataBase->currentText()=="Libros"){
@@ -683,8 +477,8 @@ void MainWindow::on_coseno_clicked()
 
     //calculo con la base de datos Jester
     if(ui->dataBase->currentText()=="Jester"){
-    db.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
-    db2.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
+    db.open("./Jester/jester.csv");
+    db2.open("./Jester/jester.csv");
     bool ok;
     user1 = ui->user1->text().toInt(&ok);
     user2 = ui->user2->text().toInt(&ok);
@@ -750,8 +544,8 @@ void MainWindow::on_jaccard_clicked()
 
     //calculo con la base de datos Jester
     if(ui->dataBase->currentText()=="Jester"){
-    db.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
-    db2.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
+    db.open("./Jester/jester.csv");
+    db2.open("./Jester/jester.csv");
     bool ok;
     user1 = ui->user1->text().toInt(&ok);
     user2 = ui->user2->text().toInt(&ok);
@@ -806,15 +600,14 @@ void MainWindow::on_jaccard_clicked()
 }
 
 void MainWindow::on_knn_clicked(){
-
     ui->listResultados->clear();
 
     //calculo con la base de datos Jester
     if(ui->dataBase->currentText()=="Jester"){
     if(ui->distancia->currentText()=="Pearson"){
 
-    db.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
-    db2.open("E:/Proyectos/QT/TBD/TBD/Jester/jester.csv");
+    db.open("./Jester/jester.csv");
+    db2.open("./Jester/jester.csv");
     QString strResult;
     double knn[1000];
     int kni[1000];
@@ -902,22 +695,6 @@ void MainWindow::on_knn_clicked(){
     }
 
 }
-
-double MainWindow::coseno_ajustar_mr(QVector<QVector<double>>ratings_,QVector<double>promedioUser_,int indexMovie1,int indexMovie2)
-{
-    double sumNum=0, sumDenMov1=0, sumDenMov2=0,result;
-    for(int j=0;j<ratings_.size();j++){
-        if(ratings_[indexMovie1][j]!=0 && ratings_[indexMovie2][j]!=0){
-            sumNum += (ratings_[indexMovie1][j]-promedioUser_[j])*(ratings_[indexMovie2][j]-promedioUser_[j]);
-            sumDenMov1 += pow(ratings_[indexMovie1][j]-promedioUser_[j],2);
-            sumDenMov2 += pow(ratings_[indexMovie2][j]-promedioUser_[j],2);
-        }
-    }
-    sumDenMov1 = sqrt(sumDenMov1);
-    sumDenMov2 = sqrt(sumDenMov2);
-    result=sumNum/(sumDenMov1*sumDenMov2);
-    return result;
-}
 void MainWindow::on_cosenoAjustado_clicked()
 {
     ui->listResultados->clear();
@@ -926,7 +703,7 @@ void MainWindow::on_cosenoAjustado_clicked()
     if(ui->dataBase->currentText()=="MovieRatings"){
     string indexUsers[25]={"Patrick C","Heather","Bryan","Patrick T","Thomas","aaron","vanessa","greg","brian","ben","Katherine","Jonathan","Zwe","Erin","Chris","Zak","Matt","Chris","Josh","Amy","Valerie","Gary","Stephen","Jessica","Jeff"};
     string indexMovies[25]={"Alien","Avatar","Blade Runner","Braveheart","Dodgeball","Forest Gump","Gladiator","Jaws","Kazaam","Lord of the Rings","Napolean Dynamite","Old School","Pootie Tang","Pulp Fiction","Scarface","Shawshank Redemption","Snakes on a Plane","Spiderman","Star Wars","The Dark Knight","The Happening","The Matrix","Toy Story","Village","You Got Mail"};
-    cargarBDgrande();
+
     double promedioUser[25]={3.61111,3.93333,3.36364,3.13333,3.68182,3.71429,3.2,4.05556,3.86957,3.75,4,4.05556,3.22727,3.41667,2.875,3.73684,2.66667,3.18182,4.18182,3.05882,3.3913,3.04762,3.33333,3.25,3.63636};
     double promedioMovie[25]={3.86111,3.74667,4.0303,4.05965,3.79437,4.3631,4.16842,3.42398,1.92935,3.625,2.875,4.22531,2.13636,4.20098,3.90625,4.8114,2.31111,3.63258,4.79051,4.58204,1.54891,4.21946,4.41333,2.75,1.97576};
 
@@ -1034,7 +811,7 @@ void MainWindow::on_cosenoAjustado_clicked()
         //obteniendo los ratings de user 1 y user 2
         struser1 = ui->user1->text().toStdString();
         struser2 = ui->user2->text().toStdString();
-        db.open("E:/Proyectos/QT/TBD/TBD/Book/Ratings.csv");
+        db.open("./Book/Ratings.csv");
         for(int i=0;i<433665;i++){//433665
             db>>cadena;
             user=cadena;
@@ -1072,7 +849,7 @@ void MainWindow::on_cosenoAjustado_clicked()
         double sum=0;
         int contuserprom=0;
         for(int p=0;p<contprom;p++){
-            db.open("E:/Proyectos/QT/TBD/TBD/Book/Ratings.csv");
+            db.open("./Book/Ratings.csv");
             for(int i=0;i<1149766;i++){//1149766
                 db>>cadena;
                 user=cadena;
@@ -1120,7 +897,7 @@ void MainWindow::on_cosenoAjustado_clicked()
     }
     //MOVIELENS
     if(ui->dataBase->currentText()=="MovieLensSmall"){
-        db.open("E:/Proyectos/QT/TBD/TBD/MovieLens/ratingschange.csv");
+        db.open("./MovieLens/ratingschange.csv");
         string strmovie1,strmovie2;
         strmovie1 = ui->user1->text().toStdString();
         strmovie2 = ui->user2->text().toStdString();
@@ -1167,7 +944,7 @@ void MainWindow::on_cosenoAjustado_clicked()
         double sum=0;
         int contuserprom=0;
         for(int p=0;p<contprom;p++){
-            db.open("E:/Proyectos/QT/TBD/TBD/MovieLens/ratingschange.csv");
+            db.open("./MovieLens/ratingschange.csv");
             for(int i=0;i<1149766;i++){//1149766
                 db>>cadena;
                 user=cadena;
@@ -1212,37 +989,11 @@ void MainWindow::on_cosenoAjustado_clicked()
         ui->listResultados->addItem(QString::number(result));
     }
 }
-QVector<double> MainWindow::Cos_matriz(QVector<QVector<double>>t_ratings_,QVector<double>t_promedioUser_)
-{
-    QVector<double>matrizCoseno;
-    int cont=0;
-    double sumNum=0, sumDenMov1=0, sumDenMov2=0,result=0;
-    for(int i=0;i<t_ratings_.size()-1;i++){
-        for(int k=i+1;k<t_ratings_.size();k++){
-            for(int j=0;j<t_promedioUser_.size();j++){
-                if(t_ratings_[i][j]!=0 && t_ratings_[k][j]!=0){
-                    sumNum += (t_ratings_[i][j]-t_promedioUser_[j])*(t_ratings_[k][j]-t_promedioUser_[j]);
-                    sumDenMov1 += pow(t_ratings_[i][j]-t_promedioUser_[j],2);
-                    sumDenMov2 += pow(t_ratings_[k][j]-t_promedioUser_[j],2);
-                }
-            }
-            sumDenMov1 = sqrt(sumDenMov1);
-            sumDenMov2 = sqrt(sumDenMov2);
-            result=sumNum/(sumDenMov1*sumDenMov2);
-            ui->tableWidget->setItem(i,k-1,new QTableWidgetItem(QString::number(result)));
-            //cout<<result<<",";
-            matrizCoseno.push_back(result);
-            cont++;
-            sumNum=0, sumDenMov1=0, sumDenMov2=0,result=0;
-        }
-        //cout<<endl;
-    }
-  return matrizCoseno;
-}
+
 void MainWindow::on_Matriz_clicked()
 {
     ui->listResultados->clear();
-    if(ui->dataBase->currentText()=="MovieRatings"){
+    if(ui->dataBase->currentText()=="MovieRatings") {
         double promedioUser[25]={3.61111,3.93333,3.36364,3.13333,3.68182,3.71429,3.2,4.05556,3.86957,3.75,4,4.05556,3.22727,3.41667,2.875,3.73684,2.66667,3.18182,4.18182,3.05882,3.3913,3.04762,3.33333,3.25,3.63636};
         double promedioMovie[25]={3.86111,3.74667,4.0303,4.05965,3.79437,4.3631,4.16842,3.42398,1.92935,3.625,2.875,4.22531,2.13636,4.20098,3.90625,4.8114,2.31111,3.63258,4.79051,4.58204,1.54891,4.21946,4.41333,2.75,1.97576};
         double matrizCoseno[300];//n(n-1)/2
@@ -1316,12 +1067,82 @@ void MainWindow::on_Matriz_clicked()
                     cont++;
                     sumNum=0, sumDenMov1=0, sumDenMov2=0,result=0;
                 }
-                //cout<<endl;
             }
         }
     }
-    if(ui->dataBase->currentText()=="MovieLensSmall"){
 
+    if(ui->dataBase->currentText()=="MovieLensSmall"){
+        ui->tableWidget->clear();
+        int size;
+        bool ok;
+        size = ui->sizeMatriz->text().toInt(&ok);
+        ui->tableWidget->setRowCount(size-1);
+        ui->tableWidget->setColumnCount(size-1);
+        QStringList usersVertical;
+        QStringList usersHorizontal;
+        char cadena[20];
+        db.open("./MovieLens/ratingschange.csv");
+        string movie1,movie2;
+        for(int i=0;i<size-1;i++){
+            db>>cadena;//user
+            db>>cadena;//movie
+            movie1=cadena;
+            db>>cadena;//rating
+            usersVertical<<QString::fromStdString(movie1);
+        }
+        db.close();
+        db.open("./MovieLens/ratingschange.csv");
+        db>>cadena;//user
+        db>>cadena;//movie
+        movie2=cadena;
+        db>>cadena;//rating
+        for(int i=1;i<size;i++){
+            db>>cadena;//user
+            db>>cadena;//movie
+            movie2=cadena;
+            db>>cadena;//rating
+            usersHorizontal<<QString::fromStdString(movie2);
+        }
+        db.close();
+        ui->tableWidget->setHorizontalHeaderLabels(usersHorizontal);
+        ui->tableWidget->setVerticalHeaderLabels(usersVertical);
+    }
+    //LIBROS
+    if(ui->dataBase->currentText()=="Libros"){
+        ui->tableWidget->clear();
+        int size;
+        bool ok;
+        size = ui->sizeMatriz->text().toInt(&ok);
+        ui->tableWidget->setRowCount(size-1);
+        ui->tableWidget->setColumnCount(size-1);
+        QStringList usersVertical;
+        QStringList usersHorizontal;
+        char cadena[20];
+        db.open("./Book/HeaderBook.csv");
+        string movie1,movie2;
+        for(int i=0;i<size-1;i++){
+            db>>cadena;//user
+            db>>cadena;//movie
+            movie1=cadena;
+            db>>cadena;//rating
+            usersVertical<<QString::fromStdString(movie1);
+        }
+        db.close();
+        db.open("./Book/HeaderBook.csv");
+        db>>cadena;//user
+        db>>cadena;//movie
+        movie2=cadena;
+        db>>cadena;//rating
+        for(int i=1;i<size;i++){
+            db>>cadena;//user
+            db>>cadena;//movie
+            movie2=cadena;
+            db>>cadena;//rating
+            usersHorizontal<<QString::fromStdString(movie2);
+        }
+        db.close();
+        ui->tableWidget->setHorizontalHeaderLabels(usersHorizontal);
+        ui->tableWidget->setVerticalHeaderLabels(usersVertical);
     }
 
 }
@@ -1336,14 +1157,18 @@ void MainWindow::on_predecir_clicked()
             for(int j=0;j<25;j++){
                 if(ratings[i][j]!=0){
                     ratingsNorm[i][j]=(2*(ratings[i][j]-1)-(4))/4;
+                    //cout<<ratingsNorm[i][j]<<",";
                     //ui->listResultados->addItem(QString::number(ratingsNorm[i][j]));
+
                 }
                 else{
                     ratingsNorm[i][j]=-2;
+                    //cout<<ratingsNorm[i][j]<<",";
                 }
             }
+            cout<<endl;
         }
-        //Matriz de similitud
+        //Matriz de coseno ajustado
         double matrizCoseno[25][25];//n(n-1)/2
         double promedioUser[25]={3.61111,3.93333,3.36364,3.13333,3.68182,3.71429,3.2,4.05556,3.86957,3.75,4,4.05556,3.22727,3.41667,2.875,3.73684,2.66667,3.18182,4.18182,3.05882,3.3913,3.04762,3.33333,3.25,3.63636};
 
@@ -1405,171 +1230,15 @@ void MainWindow::on_predecir_clicked()
         else{
             ui->listResultados->addItem("User o Movie no encontrados");
         }
-
     }
-    //BASE DE DATOS LIBROS
-    if(ui->dataBase->currentText()=="Libros"){
-        string userin, bookin;
-        userin = ui->user1->text().toStdString();
-        bookin = ui->user2->text().toStdString();
-        db.open("E:/Proyectos/QT/TBD/TBD/Book/Ratings.csv");
-        char cadena[20];
-        double ratingsUser[2600],nRatingsUser[2600];
-        int contRatings=0;
-        string codesBook[2600]; string struser,strbook,strrating;
-        double max=-1,min=11;
-        //Obteniendo ratings, max y min de user
-        for(int i=0;i<433665;i++){
-            db>>cadena;
-            struser=cadena;
-            db>>cadena;
-            strbook=cadena;
-            db>>cadena;
-            strrating=cadena;
-            if(struser==userin){
-                ratingsUser[contRatings]=atof(strrating.c_str());
-                codesBook[contRatings]=strbook;
-                if(ratingsUser[contRatings]>max){
-                    max=ratingsUser[contRatings];
-                }
-                if(ratingsUser[contRatings]<min){
-                    min=ratingsUser[contRatings];
-                }
-                contRatings++;
-            }
-        }
-        db.close();
-        //ui->listResultados->addItem(QString::number(contRatings));
-        //ui->listResultados->addItem(QString::number(max));
-        //ui->listResultados->addItem(QString::number(min));
 
-        double sumN=0,sumD=0;
-        string struser1;
-        string struser2;
-        float ratingsuser1[2600];
-        int indexuser1[2600],contuser1=0;
-        float ratingsuser2[2600];
-        int indexuser2[2600],contuser2=0;
-        double promrating[2600];
-        int indexprom[2600],contprom=0;
-        string book, rating, user;
-        string bookh;
-        double sum=0;
-        int contuserprom=0;
-        double result=0;
-        double sumNum=0;
-        double sumDenMov1=0;
-        double sumDenMov2=0;
-        //Normalizar puntajes de user
-        for(int i=0;i<contRatings;i++){
-            nRatingsUser[i]=(2*(ratingsUser[i]-min)-(max-min))/(max-min);
-            //ui->listResultados->addItem(QString::number(ratingsUser[i]));
+    if(ui->dataBase->currentText()=="MovieLensSmall"){
+        string user, movie;
+        user = ui->user1->text().toStdString();
+        movie = ui->user2->text().toStdString();
+        int userIndex[2600],contUser=0;
 
-            //Calculando coseno ajustado de los valores necesarios
-
-            //Pasando los valores de para calcular el cosenoajustado
-            struser1 = bookin;
-            struser2 = codesBook[i];
-            //ui->listResultados->addItem(QString::fromStdString(struser1));
-           // ui->listResultados->addItem(QString::fromStdString(struser2));
-
-            contuser1=0;
-            contuser2=0;
-            contprom=0;
-            db.open("E:/Proyectos/QT/TBD/TBD/Book/Ratings.csv");
-            for(int i=0;i<433665;i++){//433665
-                db>>cadena;
-                user=cadena;
-                db>>cadena;
-                book=cadena;
-                db>>cadena;
-                rating=cadena;
-                if(book==struser1){
-                    //dbs<<user<<" "<<rating<<endl;
-                    indexuser1[contuser1]=stoi(user);
-                    ratingsuser1[contuser1]=stof(rating);
-                    //ui->listResultados->addItem(QString::number(indexuser1[contuser1]));
-                    contuser1++;
-                }
-                if(book==struser2){
-                    indexuser2[contuser2]=stoi(user);
-                    ratingsuser2[contuser2]=stof(rating);
-                    //ui->listResultados->addItem(QString::number(indexuser2[contuser2]));
-                    contuser2++;
-
-                }
-            }
-            db.close();
-            //obteniendo de promedios necesarios
-            for(int i=0;i<contuser1;i++){
-                for(int j=0;j<contuser2;j++){
-                    if(indexuser1[i]==indexuser2[j]){
-                        indexprom[contprom]=indexuser1[i];
-                        contprom++;
-                    }
-                }
-            }
-
-            //calculando promedios 0002005018  0887841740
-            sum=0;
-            contuserprom=0;
-            for(int p=0;p<contprom;p++){
-                db.open("E:/Proyectos/QT/TBD/TBD/Book/Ratings.csv");
-                for(int i=0;i<433665;i++){//1149766
-                    db>>cadena;
-                    user=cadena;
-                    db>>cadena;
-                    book=cadena;
-                    db>>cadena;
-                    rating=cadena;
-                    if(stoi(user)==indexprom[p]){
-                        sum+=stof(rating);
-                        contuserprom++;
-                    }
-                }
-                sum=sum/contuserprom;
-                promrating[p]=sum;
-                db.close();
-            }
-
-            //0002005018  0887841740    0425105334 0451524934
-            //calculando el coseno ajustado
-
-            result=0;
-            sumNum=0;
-            sumDenMov1=0;
-            sumDenMov2=0;
-            int contp=0;
-            for(int i=0;i<contuser1;i++){
-                for(int j=0;j<contuser2;j++){
-                    if(indexuser1[i]==indexuser2[j]){
-                        sumNum += (ratingsuser1[i]-promrating[contp])*(ratingsuser2[j]-promrating[contp]);
-                        sumDenMov1 += pow(ratingsuser1[i]-promrating[contp],2);
-                        sumDenMov2 += pow(ratingsuser2[j]-promrating[contp],2);
-                        //ui->listResultados->addItem(QString::number(indexuser1[i]));
-                        contp++;
-                    }
-                }
-            }
-            sumDenMov1 = sqrt(sumDenMov1);
-            sumDenMov2 = sqrt(sumDenMov2);
-            if(sumDenMov1*sumDenMov2==0){
-                result=0;
-                //ui->listResultados->addItem("No tienen");
-            }
-            else{
-                result=sumNum/(sumDenMov1*sumDenMov2);
-                //ui->listResultados->addItem(QString::number(result));
-            }
-
-            sumN+=result * nRatingsUser[i];
-            sumD+=abs(result);
-        }
-        result=sumN/sumD;
-        ui->listResultados->addItem(QString::number(result));
-        //desnormalizar
-        result=((result+1)*(max-min)/2)+min;
-        ui->listResultados->addItem(QString::number(result));
+        db.open("./MovieLens/ratingschange.csv");
 
     }
 

@@ -2,8 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QVector>
-#include <vector>
+#include <iostream>
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -17,7 +18,6 @@ public:
     ~MainWindow();
 
 private slots:
-
 
     void on_manhatan_clicked();
 
@@ -37,14 +37,11 @@ private slots:
 
     void on_Matriz_clicked();
 
-    int buscar(QVector<QString>, QString);
-    double fun_euclideana(QVector<double>,QVector<double>);
-    double fun_manhatan(QVector<double>,QVector<double>);
-    double fun_pearson(QVector<double>,QVector<double>);
-    double coseno_ajustar_mr(QVector<QVector<double>>,QVector<double>,int,int);
-    QVector<double>Cos_matriz(QVector<QVector<double>>,QVector<double>);
+    void on_predecir_clicked();
 
 private:
     Ui::MainWindow *ui;
+    std::map<std::string,std::map<std::string,float> > mapa;
+    bool chunk;
 };
 #endif // MAINWINDOW_H
